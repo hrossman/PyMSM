@@ -72,29 +72,33 @@ def competingrisks_stackplot(
     cifs_top = []
     for i, failure_type in enumerate(order_top):
         color = f"C{failure_type}"
-        cif = 1 - cumulative_densities[failure_type].values
+        cif = cumulative_densities[failure_type].values
+        
         if i == 0:
-            ax.fill_between(times, 1, cif, alpha=0.8, color=color)
+            inv_cif=1-cif
+            ax.fill_between(times, 1, inv_cif, alpha=0.8, color=color)
             ax.text(
                 x=times[-1] * 1.02,
-                y=(cif[-1] + (1 - cif[-1]) / 2),
+                y=(inv_cif[-1] + (1 - inv_cif[-1]) / 2),
                 s=state_labels[failure_type],
                 fontsize=fontsize,
                 color=color,
             )
         else:
-            cif = cif - cifs_top[i - 1]
-            ax.fill_between(times, cifs_top[i - 1], cif, alpha=0.8, color=color)
+            
+            cif = cif + cifs_top[i - 1]
+            inv_cif=1-cif
+            inv_top=1-cifs_top[i - 1]
+            ax.fill_between(times , inv_cif, inv_top , alpha=0.8, color=color)
             ax.text(
                 x=times[-1] * 1.02,
-                y=(cif[-1] + (cifs_top[i - 1][-1] - cif[-1]) / 2),
+                y=(inv_cif[-1] + (inv_top[-1] - inv_cif[-1]) / 2),
                 s=state_labels[failure_type],
                 fontsize=fontsize,
                 color=color,
             )
-        ax.plot(times, cif, color="k")
+        ax.plot(times, 1-cif, color="k")
         cifs_top.append(cif)
-
     cifs_bottom = []
     for i, failure_type in enumerate(order_bottom):
         color = f"C{failure_type}"
